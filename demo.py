@@ -50,11 +50,11 @@ class ImgPredictor(object):
     def predict_img(self, img_path):
         print('[Info] 预测图像路径: {}'.format(img_path))
         img_np = self.gan.read_img(img_path)
-        # print('[Info] img_np shape: {}'.format(img_np.shape))
+        print('[Info] 输入尺寸: {}'.format(img_np.shape))
 
         img_fake = self.gan.predict_img(img_np, self.sess)
         img_fake = np.squeeze(img_fake, axis=0)
-        # print('[Info] img_fake shape: {}'.format(img_fake.shape))
+        print('[Info] 输出尺寸: {}'.format(img_fake.shape))
 
         img_fake = inverse_transform(img_fake)
         img_fake = img_fake.astype(np.uint8)
