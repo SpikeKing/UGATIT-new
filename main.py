@@ -92,9 +92,9 @@ def main():
 
     # 自定义参数
     args.epoch = 1000
-    args.batch_size = 4
+    args.batch_size = 1
     args.dataset = "s2a_zhengsheng"
-    args.gan_type = "dragan"
+    # args.gan_type = "dragan"
 
     # open session
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
