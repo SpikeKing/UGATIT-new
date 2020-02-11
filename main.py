@@ -1,3 +1,9 @@
+# -- coding: utf-8 --
+"""
+Copyright (c) 2019. All rights reserved.
+Created by C. L. Wang on 2020/2/11
+"""
+
 from UGATIT import UGATIT
 import argparse
 from utils.ugatit_utils import *
@@ -83,6 +89,12 @@ def main():
     args = parse_args()
     if args is None:
       exit()
+
+    # 自定义参数
+    args.epoch = 1000
+    args.batch_size = 4
+    args.dataset = "s2a_zhengsheng"
+    args.gan_type = "dragan"
 
     # open session
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
