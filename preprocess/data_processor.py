@@ -7,7 +7,12 @@ Created by C. L. Wang on 2020/2/11
 
 import os
 import cv2
+import sys
 import random
+
+p = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if p not in sys.path:
+    sys.path.append(p)
 
 from root_dir import ROOT_DIR
 from utils.project_utils import traverse_dir_files, mkdir_if_not_exist
