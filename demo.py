@@ -31,7 +31,8 @@ class ImgPredictor(object):
         if args is None:
             exit()
         args.phase = 'test'
-        args.dataset = 'selfie2anime'
+        # args.dataset = 'selfie2anime'
+        args.dataset = 's2a4zhengsheng'
         # args.light = 'True'
         args.img_size = 256
 
