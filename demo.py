@@ -4,18 +4,14 @@
 Copyright (c) 2019. All rights reserved.
 Created by C. L. Wang on 2020/1/2
 """
-import os
 
-import cv2
-import numpy as np
-import tensorflow as tf
+import argparse
 
 from UGATIT import UGATIT
 from main import parse_args
-from utils.project_utils import traverse_dir_files, mkdir_if_not_exist
-from utils.ugatit_utils import inverse_transform
-
 from root_dir import DATA_DIR
+from utils.project_utils import traverse_dir_files, mkdir_if_not_exist
+from utils.ugatit_utils import *
 
 
 class ImgPredictor(object):
@@ -23,7 +19,14 @@ class ImgPredictor(object):
     图像预测类
     """
 
-    def __init__(self):
+    def __init__(self, gan_type='lsgan', adv_weight=1, cycle_weight=10, identity_weight=10, cam_weight=1000):
+        self.gan_type = gan_type
+
+        self.adv_weight = adv_weight
+        self.cycle_weight = cycle_weight
+        self.identity_weight = identity_weight
+        self.cam_weight = cam_weight
+
         self.gan, self.sess = self.init_model()
 
     def init_model(self):
@@ -31,10 +34,14 @@ class ImgPredictor(object):
         if args is None:
             exit()
         args.phase = 'test'
-        # args.dataset = 'selfie2anime'
         args.dataset = 's2a4zhengsheng'
-        # args.light = 'True'
         args.img_size = 256
+
+        args.gan_type = self.gan_type
+        args.adv_weight = self.adv_weight
+        args.cycle_weight = self.cycle_weight
+        args.identity_weight = self.identity_weight
+        args.cam_weight = self.cam_weight
 
         # open session
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
@@ -76,6 +83,48 @@ def img_predictor_test():
     paths_list, names_list = traverse_dir_files(img_dir)
 
     ip = ImgPredictor()
+    for path, name in zip(paths_list, names_list):
+        img_fake = ip.predict_img(path)
+        img_fake = cv2.cvtColor(img_fake, cv2.COLOR_RGB2BGR)
+        img_fake_path = os.path.join(img_out_dir, '{}.out.jpg'.format(name))
+        cv2.imwrite(img_fake_path, img_fake)
+        print('[Info] 写入图像路径: {}'.format(img_fake_path))
+
+    print('[Info] 测试完成!')
+
+
+def img_predictor_test_v2():
+    """
+    图像预测测试
+    """
+    img_dir = os.path.join(DATA_DIR, 'imgs')
+    img_out_dir = os.path.join(DATA_DIR, 'outputs-v2')
+    mkdir_if_not_exist(img_out_dir)
+    paths_list, names_list = traverse_dir_files(img_dir)
+
+    ip = ImgPredictor(gan_type='dragan')
+
+    for path, name in zip(paths_list, names_list):
+        img_fake = ip.predict_img(path)
+        img_fake = cv2.cvtColor(img_fake, cv2.COLOR_RGB2BGR)
+        img_fake_path = os.path.join(img_out_dir, '{}.out.jpg'.format(name))
+        cv2.imwrite(img_fake_path, img_fake)
+        print('[Info] 写入图像路径: {}'.format(img_fake_path))
+
+    print('[Info] 测试完成!')
+
+
+def img_predictor_test_v3():
+    """
+    图像预测测试
+    """
+    img_dir = os.path.join(DATA_DIR, 'imgs')
+    img_out_dir = os.path.join(DATA_DIR, 'outputs-v3')
+    mkdir_if_not_exist(img_out_dir)
+    paths_list, names_list = traverse_dir_files(img_dir)
+
+    ip = ImgPredictor(gan_type='dragan', adv_weight=1, cycle_weight=15, identity_weight=10, cam_weight=1500)
+
     for path, name in zip(paths_list, names_list):
         img_fake = ip.predict_img(path)
         img_fake = cv2.cvtColor(img_fake, cv2.COLOR_RGB2BGR)
@@ -145,7 +194,9 @@ def merge_one_img():
 
 
 def main():
-    img_predictor_test()
+    # img_predictor_test()
+    img_predictor_test_v2()
+    img_predictor_test_v3()
     # merge_one_img()
 
 
