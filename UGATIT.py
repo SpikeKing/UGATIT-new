@@ -108,7 +108,7 @@ class UGATIT(object):
         初始化模型
         """
         tf.global_variables_initializer().run(session=sess)
-        self.saver = tf.train.Saver()
+        self.saver = tf.train.Saver(max_to_keep=150)  # 保留全部模型
         could_load, checkpoint_counter = self.load(self.checkpoint_dir)
         print('[Info] 是否加载成功: {}, 模型版本号: {}'.format(could_load, checkpoint_counter))
 
@@ -518,7 +518,7 @@ class UGATIT(object):
         tf.global_variables_initializer().run()
 
         # saver to save model
-        self.saver = tf.train.Saver()
+        self.saver = tf.train.Saver(max_to_keep=150)  # 保留全部模型
 
         # summary writer
         self.writer = tf.summary.FileWriter(self.log_dir + '/' + self.model_dir, self.sess.graph)
