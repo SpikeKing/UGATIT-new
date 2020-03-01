@@ -4,9 +4,7 @@
 Copyright (c) 2019. All rights reserved.
 Created by C. L. Wang on 2020/1/2
 """
-
-import argparse
-
+import math
 from UGATIT import UGATIT
 from main import parse_args
 from root_dir import DATA_DIR
@@ -34,7 +32,8 @@ class ImgPredictor(object):
         if args is None:
             exit()
         args.phase = 'test'
-        args.dataset = 's2a4zhengsheng'
+        # args.dataset = 's2a4zhengsheng'
+        args.dataset = 'selfie2anime'
         args.img_size = 256
 
         args.gan_type = self.gan_type
@@ -77,7 +76,7 @@ def img_predictor_test():
     """
     图像预测测试
     """
-    img_dir = os.path.join(DATA_DIR, 'imgs')
+    img_dir = os.path.join(DATA_DIR, 'heads-60')
     img_out_dir = os.path.join(DATA_DIR, 'outputs')
     mkdir_if_not_exist(img_out_dir)
     paths_list, names_list = traverse_dir_files(img_dir)
@@ -150,7 +149,7 @@ def merge_imgs(imgs, cols=6, rows=6):
     img_shape = imgs[0].shape
     h, w, _ = img_shape
 
-    large_imgs = np.zeros((rows * h, cols * w, 3))  # 大图
+    large_imgs = np.ones((rows * h, cols * w, 3)) * 255  # 大图
 
     for j in range(rows):
         for i in range(cols):
@@ -193,11 +192,88 @@ def merge_one_img():
     cv2.imwrite(large_img_path, large_img)
 
 
+def merge_outputs():
+    img_dir = os.path.join(DATA_DIR, 'outputs')
+    paths_list, names_list = traverse_dir_files(img_dir)
+    print('[Info] 图像数: {}'.format(len(paths_list)))
+    img_size = 256
+
+    img_list = []
+    for path, name in zip(paths_list, names_list):
+        img = cv2.imread(path)
+        img = cv2.resize(img, (img_size, img_size))
+        img_list.append(img)
+
+    large_img = merge_imgs(img_list, cols=10, rows=6)
+    large_img_path = os.path.join(DATA_DIR, 'xxx-out.jpg')
+    cv2.imwrite(large_img_path, large_img)
+
+
+def merge_sample():
+    # sample_dir = 'UGATIT_s2a4zhengsheng_dragan_4resblock_6dis_1_1_10_10_1000_sn_smoothing'
+    # sample_dir = 'UGATIT_s2a4zhengsheng_dragan_4resblock_6dis_1_1_15_10_1500_sn_smoothing'
+    # sample_dir = 'UGATIT_selfie2anime4zs_lsgan_4resblock_6dis_1_1_10_10_1000_sn_smoothing'
+    sample_dir = 'UGATIT_s2a4zhengsheng_lsgan_4resblock_6dis_1_1_10_10_1000_sn_smoothing'
+
+    img_dir = os.path.join(DATA_DIR, 'samples', sample_dir)
+    paths_list, names_list = traverse_dir_files(img_dir)
+    img_size = 256
+
+    img_fake_list = []
+    for path, name in zip(paths_list, names_list):
+        if not name.startswith('fake'):
+            continue
+        img_fake_list.append(path)
+
+    img_real_list = []
+    for path, name in zip(paths_list, names_list):
+        if not name.startswith('real'):
+            continue
+        img_real_list.append(path)
+
+    img_list = []
+    for p_fake, p_real in zip(img_fake_list, img_real_list):
+        img = cv2.imread(p_real)
+        img = cv2.resize(img, (img_size, img_size * 2))
+        img_list.append(img)
+
+        img = cv2.imread(p_fake)
+        img = cv2.resize(img, (img_size, img_size * 2))
+        img_list.append(img)
+
+    n_imgs = len(img_list)
+    print('图像数量: {}'.format(n_imgs))
+    cols = 64
+    rows = int(math.ceil(n_imgs / float(cols)))
+
+    large_img = merge_imgs(img_list, cols=cols, rows=rows)
+    large_img_path = os.path.join(DATA_DIR, '{}.jpg'.format(sample_dir))
+    cv2.imwrite(large_img_path, large_img)
+
+
+def resize_folder():
+    img_dir = os.path.join(DATA_DIR, 'heads-60')
+    img_out_dir = os.path.join(DATA_DIR, 'heads-60w256')
+
+    mkdir_if_not_exist(img_out_dir)
+
+    paths_list, names_list = traverse_dir_files(img_dir)
+    print('[Info] 图像数: {}'.format(len(paths_list)))
+    img_size = 256
+
+    for path, name in zip(paths_list, names_list):
+        img = cv2.imread(path)
+        img = cv2.resize(img, (img_size, img_size))
+        cv2.imwrite(os.path.join(img_out_dir, name), img)
+
+
 def main():
     # img_predictor_test()
-    img_predictor_test_v2()
-    img_predictor_test_v3()
-    # merge_one_img()
+    # img_predictor_test_v2()
+    # img_predictor_test_v3()
+    # merge_outputs()
+    # merge_sample()
+    resize_folder()
 
 
 if __name__ == '__main__':

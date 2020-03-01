@@ -20,8 +20,8 @@ from utils.project_utils import traverse_dir_files, mkdir_if_not_exist
 
 class DataProcessor(object):
     def __init__(self):
-        self.cartoons_path = os.path.join(ROOT_DIR, 'dataset', 'anime_face')
-        self.persons_path = os.path.join(ROOT_DIR, 'dataset', 'chs_stars_512px')
+        self.persons_path = os.path.join(ROOT_DIR, 'dataset', 'trainA_extra')
+        self.cartoons_path = os.path.join(ROOT_DIR, 'dataset', 'trainB_extra')
 
         self.std_dim = 256
 
@@ -36,13 +36,13 @@ class DataProcessor(object):
         random.shuffle(c_paths_list)
         random.shuffle(p_paths_list)
 
-        train_size = 80000  # 训练集量
-        test_size = 5000  # 测试集量
-        print_size = 1000
+        train_size = 1500  # 训练集量
+        test_size = 100  # 测试集量
+        print_size = 100
 
         count = 0
-        train_person_dir = os.path.join(ROOT_DIR, 'dataset', 's2a_zhengsheng', 'trainA')
-        test_person_dir = os.path.join(ROOT_DIR, 'dataset', 's2a_zhengsheng', 'testA')
+        train_person_dir = os.path.join(ROOT_DIR, 'dataset', 's2a4zsV1', 'trainA')
+        test_person_dir = os.path.join(ROOT_DIR, 'dataset', 's2a4zsV1', 'testA')
         mkdir_if_not_exist(train_person_dir)
         mkdir_if_not_exist(test_person_dir)
 
@@ -53,9 +53,9 @@ class DataProcessor(object):
                 p_img = cv2.resize(p_img, (256, 256))
 
                 if count < train_size:
-                    p_file_name = os.path.join(train_person_dir, u"p_{}.jpg".format(count))
+                    p_file_name = os.path.join(train_person_dir, u"p_{:04d}.jpg".format(count+1))
                 else:
-                    p_file_name = os.path.join(test_person_dir, u"p_{}.jpg".format(count))
+                    p_file_name = os.path.join(test_person_dir, u"p_{:04d}.jpg".format(count+1))
 
                 cv2.imwrite(p_file_name, p_img)
                 count += 1
@@ -69,12 +69,12 @@ class DataProcessor(object):
             if count == train_size + test_size:
                 break
 
-        count = 0
-        train_cartoon_dir = os.path.join(ROOT_DIR, 'dataset', 's2a_zhengsheng', 'trainB')
-        test_cartoon_dir = os.path.join(ROOT_DIR, 'dataset', 's2a_zhengsheng', 'testB')
+        train_cartoon_dir = os.path.join(ROOT_DIR, 'dataset', 's2a4zsV1', 'trainB')
+        test_cartoon_dir = os.path.join(ROOT_DIR, 'dataset', 's2a4zsV1', 'testB')
         mkdir_if_not_exist(train_cartoon_dir)
         mkdir_if_not_exist(test_cartoon_dir)
 
+        count = 0
         print('[Info] 卡通样本总数: {}'.format(len(c_paths_list)))
         for c_path in c_paths_list:
             try:
@@ -82,10 +82,10 @@ class DataProcessor(object):
                 c_img = cv2.resize(c_img, (256, 256))
 
                 if count < train_size:
-                    c_file_name = os.path.join(train_cartoon_dir, u"c_{}.jpg".format(count))
+                    c_file_name = os.path.join(train_cartoon_dir, u"c_{:04d}.jpg".format(count+1))
                     cv2.imwrite(c_file_name, c_img)
                 else:
-                    c_file_name = os.path.join(test_cartoon_dir, u"c_{}.jpg".format(count))
+                    c_file_name = os.path.join(test_cartoon_dir, u"c_{:04d}.jpg".format(count+1))
                     cv2.imwrite(c_file_name, c_img)
 
                 count += 1

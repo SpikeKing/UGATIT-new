@@ -92,8 +92,8 @@ def main():
 
     # 自定义参数
     args.epoch = 1000
-    args.batch_size = 2
-    args.dataset = "s2a4zhengsheng"
+    args.batch_size = 1
+    # args.dataset = "s2a4zhengsheng"
     # args.gan_type = "dragan"
 
     # open session
