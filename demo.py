@@ -37,6 +37,8 @@ class ImgPredictor(object):
         args.dataset = 's2azsV1s2a'
         args.img_size = 256
 
+        n_epoch = "1010000"
+
         args.gan_type = self.gan_type
         args.adv_weight = self.adv_weight
         args.cycle_weight = self.cycle_weight
@@ -51,7 +53,7 @@ class ImgPredictor(object):
 
         # show network architecture
         # show_all_variables()
-        gan.init_model(sess)
+        gan.init_model(sess, n_epoch=n_epoch)
 
         return gan, sess
 
@@ -77,7 +79,7 @@ def img_predictor_test():
     """
     图像预测测试
     """
-    img_dir = os.path.join(DATA_DIR, 'heads-60')
+    img_dir = os.path.join(DATA_DIR, 'img-my-head')
     img_out_dir = os.path.join(DATA_DIR, 'outputs')
     mkdir_if_not_exist(img_out_dir)
     paths_list, names_list = traverse_dir_files(img_dir)

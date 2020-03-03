@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# -- coding: utf-8 --
+"""
+Copyright (c) 2019. All rights reserved.
+Created by C. L. Wang on 2020/1/2
+"""
+
 import tensorflow as tf
 import tensorflow.contrib as tf_contrib
 
@@ -241,7 +248,7 @@ def layer_instance_norm(x, scope='layer_instance_norm'):
         gamma = tf.get_variable("gamma", [ch], initializer=tf.constant_initializer(1.0))
         beta = tf.get_variable("beta", [ch], initializer=tf.constant_initializer(0.0))
 
-        x_hat = rho * x_ins + (1 - rho) * x_ln
+        x_hat = rho * x_ins + (1 - rho) * x_ln  # 动态选择示例正则化和层正则化
 
         x_hat = x_hat * gamma + beta
 
@@ -290,7 +297,8 @@ def L1_loss(x, y):
 
 
 def cam_loss(source, non_source):
-    identity_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(source), logits=source))
+    identity_loss = tf.reduce_mean(
+        tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(source), logits=source))
     non_identity_loss = tf.reduce_mean(
         tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.zeros_like(non_source), logits=non_source))
 

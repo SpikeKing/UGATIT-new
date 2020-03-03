@@ -103,13 +103,13 @@ class UGATIT(object):
         print("# identity_weight : ", self.identity_weight)
         print("# cam_weight : ", self.cam_weight)
 
-    def init_model(self, sess):
+    def init_model(self, sess, n_epoch="1000000"):
         """
         初始化模型
         """
         tf.global_variables_initializer().run(session=sess)
         self.saver = tf.train.Saver(max_to_keep=10000)  # 保留全部模型
-        could_load, checkpoint_counter = self.load(self.checkpoint_dir)
+        could_load, checkpoint_counter = self.load(self.checkpoint_dir, u"UGATIT.model-{}".format(n_epoch))
         print('[Info] 是否加载成功: {}, 模型版本号: {}'.format(could_load, checkpoint_counter))
 
     def read_img(self, img_path):
@@ -625,13 +625,14 @@ class UGATIT(object):
 
         self.saver.save(self.sess, os.path.join(checkpoint_dir, self.model_name + '.model'), global_step=step)
 
-    def load(self, checkpoint_dir):
+    def load(self, checkpoint_dir, ckpt_name=None):
         print(" [*] Reading checkpoints...")
         checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
 
         ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
         if ckpt and ckpt.model_checkpoint_path:
-            ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
+            if not ckpt_name:
+                ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
             self.saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))
             counter = int(ckpt_name.split('-')[-1])
             print(" [*] Success to read {}".format(ckpt_name))
