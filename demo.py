@@ -32,9 +32,9 @@ class ImgPredictor(object):
         if args is None:
             exit()
         args.phase = 'test'
-        # args.dataset = 's2a4zhengsheng'
+        args.dataset = 's2a4zhengsheng'
         # args.dataset = 'selfie2anime'
-        args.dataset = 's2azsV1s2a'
+        # args.dataset = 's2azsV1s2a'
         args.img_size = 256
 
         n_epoch = "1020000"
