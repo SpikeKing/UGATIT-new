@@ -33,7 +33,8 @@ class ImgPredictor(object):
             exit()
         args.phase = 'test'
         # args.dataset = 's2a4zhengsheng'
-        args.dataset = 'selfie2anime'
+        # args.dataset = 'selfie2anime'
+        args.dataset = 's2azsV1s2a'
         args.img_size = 256
 
         args.gan_type = self.gan_type
@@ -268,12 +269,12 @@ def resize_folder():
 
 
 def main():
-    # img_predictor_test()
+    img_predictor_test()
     # img_predictor_test_v2()
     # img_predictor_test_v3()
     # merge_outputs()
     # merge_sample()
-    resize_folder()
+    # resize_folder()
 
 
 if __name__ == '__main__':
