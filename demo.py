@@ -37,7 +37,7 @@ class ImgPredictor(object):
         args.dataset = 's2azsV1s2a'
         args.img_size = 256
 
-        n_epoch = "1010000"
+        n_epoch = "1020000"
 
         args.gan_type = self.gan_type
         args.adv_weight = self.adv_weight
@@ -196,7 +196,7 @@ def merge_one_img():
 
 
 def merge_outputs():
-    img_dir = os.path.join(DATA_DIR, 'outputs')
+    img_dir = os.path.join(DATA_DIR, 'outputs-100')
     paths_list, names_list = traverse_dir_files(img_dir)
     print('[Info] 图像数: {}'.format(len(paths_list)))
     img_size = 256
@@ -208,7 +208,7 @@ def merge_outputs():
         img_list.append(img)
 
     large_img = merge_imgs(img_list, cols=10, rows=6)
-    large_img_path = os.path.join(DATA_DIR, 'xxx-out.jpg')
+    large_img_path = os.path.join(DATA_DIR, 'xxx-out-100.jpg')
     cv2.imwrite(large_img_path, large_img)
 
 
