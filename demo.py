@@ -37,7 +37,8 @@ class ImgPredictor(object):
         # args.dataset = 's2azsV1s2a'
         args.img_size = 256
 
-        n_epoch = "1020000"
+        # n_epoch = "1020000"
+        n_epoch = None
 
         args.gan_type = self.gan_type
         args.adv_weight = self.adv_weight

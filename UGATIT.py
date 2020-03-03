@@ -103,13 +103,17 @@ class UGATIT(object):
         print("# identity_weight : ", self.identity_weight)
         print("# cam_weight : ", self.cam_weight)
 
-    def init_model(self, sess, n_epoch="1000000"):
+    def init_model(self, sess, n_epoch=None):
         """
         初始化模型
         """
         tf.global_variables_initializer().run(session=sess)
         self.saver = tf.train.Saver(max_to_keep=10000)  # 保留全部模型
-        could_load, checkpoint_counter = self.load(self.checkpoint_dir, u"UGATIT.model-{}".format(n_epoch))
+        if n_epoch:
+            n_epoch_str = u"UGATIT.model-{}".format(n_epoch)
+        else:
+            n_epoch_str = None
+        could_load, checkpoint_counter = self.load(self.checkpoint_dir, n_epoch_str)
         print('[Info] 是否加载成功: {}, 模型版本号: {}'.format(could_load, checkpoint_counter))
 
     def read_img(self, img_path):
