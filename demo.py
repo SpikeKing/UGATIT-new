@@ -99,7 +99,8 @@ def img_predictor_test_v2():
     """
     图像预测测试
     """
-    img_dir = os.path.join(DATA_DIR, 'imgs')
+    # img_dir = os.path.join(DATA_DIR, 'imgs')
+    img_dir = os.path.join(DATA_DIR, 'heads-60')
     img_out_dir = os.path.join(DATA_DIR, 'outputs-v2')
     mkdir_if_not_exist(img_out_dir)
     paths_list, names_list = traverse_dir_files(img_dir)
@@ -196,7 +197,7 @@ def merge_one_img():
 
 
 def merge_outputs():
-    img_dir = os.path.join(DATA_DIR, 'outputs-100')
+    img_dir = os.path.join(DATA_DIR, 'outputs-105')
     paths_list, names_list = traverse_dir_files(img_dir)
     print('[Info] 图像数: {}'.format(len(paths_list)))
     img_size = 256
@@ -208,7 +209,7 @@ def merge_outputs():
         img_list.append(img)
 
     large_img = merge_imgs(img_list, cols=10, rows=6)
-    large_img_path = os.path.join(DATA_DIR, 'xxx-out-100.jpg')
+    large_img_path = os.path.join(DATA_DIR, 'xxx-out-105.jpg')
     cv2.imwrite(large_img_path, large_img)
 
 
@@ -271,8 +272,8 @@ def resize_folder():
 
 
 def main():
-    img_predictor_test()
-    # img_predictor_test_v2()
+    # img_predictor_test()
+    img_predictor_test_v2()
     # img_predictor_test_v3()
     # merge_outputs()
     # merge_sample()
