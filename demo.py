@@ -102,7 +102,7 @@ def img_predictor_test_v2():
     图像预测测试
     """
     # img_dir = os.path.join(DATA_DIR, 'imgs')
-    img_dir = os.path.join(DATA_DIR, 'heads-60')
+    img_dir = os.path.join(DATA_DIR, 'heads')
     img_out_dir = os.path.join(DATA_DIR, 'outputs-v2')
     mkdir_if_not_exist(img_out_dir)
     paths_list, names_list = traverse_dir_files(img_dir)
