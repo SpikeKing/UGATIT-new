@@ -80,7 +80,8 @@ def img_predictor_test():
     """
     图像预测测试
     """
-    img_dir = os.path.join(DATA_DIR, 'heads-60')
+    # img_dir = os.path.join(DATA_DIR, 'heads-60')
+    img_dir = os.path.join(DATA_DIR, 'heads')
     img_out_dir = os.path.join(DATA_DIR, 'outputs')
     mkdir_if_not_exist(img_out_dir)
     paths_list, names_list = traverse_dir_files(img_dir)
@@ -273,8 +274,8 @@ def resize_folder():
 
 
 def main():
-    img_predictor_test()
-    # img_predictor_test_v2()
+    # img_predictor_test()
+    img_predictor_test_v2()
     # img_predictor_test_v3()
     # merge_outputs()
     # merge_sample()
