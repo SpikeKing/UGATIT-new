@@ -128,7 +128,7 @@ def img_predictor_test_v3():
     mkdir_if_not_exist(img_out_dir)
     paths_list, names_list = traverse_dir_files(img_dir)
 
-    ip = ImgPredictor(gan_type='dragan', adv_weight=1, cycle_weight=15, identity_weight=10, cam_weight=1500)
+    ip = ImgPredictor(gan_type='dragan', adv_weight=1, cycle_weight=20, identity_weight=10, cam_weight=2000)
 
     for path, name in zip(paths_list, names_list):
         img_fake = ip.predict_img(path)
