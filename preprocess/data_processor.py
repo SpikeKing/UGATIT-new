@@ -14,7 +14,7 @@ p = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if p not in sys.path:
     sys.path.append(p)
 
-from root_dir import ROOT_DIR
+from root_dir import ROOT_DIR, DATASET_DIR
 from utils.project_utils import traverse_dir_files, mkdir_if_not_exist
 
 
@@ -53,9 +53,9 @@ class DataProcessor(object):
                 p_img = cv2.resize(p_img, (256, 256))
 
                 if count < train_size:
-                    p_file_name = os.path.join(train_person_dir, u"p_{:04d}.jpg".format(count+1))
+                    p_file_name = os.path.join(train_person_dir, u"p_{:04d}.jpg".format(count + 1))
                 else:
-                    p_file_name = os.path.join(test_person_dir, u"p_{:04d}.jpg".format(count+1))
+                    p_file_name = os.path.join(test_person_dir, u"p_{:04d}.jpg".format(count + 1))
 
                 cv2.imwrite(p_file_name, p_img)
                 count += 1
@@ -82,10 +82,10 @@ class DataProcessor(object):
                 c_img = cv2.resize(c_img, (256, 256))
 
                 if count < train_size:
-                    c_file_name = os.path.join(train_cartoon_dir, u"c_{:04d}.jpg".format(count+1))
+                    c_file_name = os.path.join(train_cartoon_dir, u"c_{:04d}.jpg".format(count + 1))
                     cv2.imwrite(c_file_name, c_img)
                 else:
-                    c_file_name = os.path.join(test_cartoon_dir, u"c_{:04d}.jpg".format(count+1))
+                    c_file_name = os.path.join(test_cartoon_dir, u"c_{:04d}.jpg".format(count + 1))
                     cv2.imwrite(c_file_name, c_img)
 
                 count += 1
@@ -107,8 +107,44 @@ def data_processor_test():
     dp.process_dataset()
 
 
+def data_processor_testV3():
+    dataset_dir = os.path.join(DATASET_DIR, 's2a4zsV4')
+
+    # person_path = "/Users/wangchenlong/Downloads/seeprettyface_asian_stars"
+    person_path = "/Users/wangchenlong/Downloads/SCUT-FBP5500_v2/Images"
+    paths_list, names_list = traverse_dir_files(person_path)
+
+    trainA_dir = os.path.join(dataset_dir, 'trainA')
+    testA_dir = os.path.join(dataset_dir, 'testA')
+    mkdir_if_not_exist(trainA_dir)
+    mkdir_if_not_exist(testA_dir)
+
+    train_size = 5000
+    test_size = 100
+    print_size = 100
+
+    count = 0
+    random.shuffle(paths_list)
+    for path in paths_list:
+        img = cv2.imread(path)
+        img = cv2.resize(img, (256, 256))
+        if count < train_size:
+            file_name = os.path.join(trainA_dir, u"c_{:04d}.jpg".format(count + 1))
+            cv2.imwrite(file_name, img)
+        else:
+            file_name = os.path.join(testA_dir, u"c_{:04d}.jpg".format(count + 1))
+            cv2.imwrite(file_name, img)
+        count += 1
+        if count % print_size == 0:
+            print(u'[Info] run count: {}'.format(count))
+        if count == train_size + test_size:
+            break
+    print('[Info] 数据处理完成')
+
+
 def main():
-    data_processor_test()
+    # data_processor_test()
+    data_processor_testV3()
 
 
 if __name__ == '__main__':

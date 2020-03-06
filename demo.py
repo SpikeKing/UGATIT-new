@@ -72,6 +72,9 @@ class ImgPredictor(object):
         # show_img_rgb(img_fake)
         return img_fake
 
+    def export_model(self):
+        self.gan.export_model()
+
     def close_sess(self):
         self.sess.close()
 
@@ -273,10 +276,16 @@ def resize_folder():
         cv2.imwrite(os.path.join(img_out_dir, name), img)
 
 
+def model_export():
+    ip = ImgPredictor()
+    ip.export_model()
+
+
 def main():
+    model_export()
     # img_predictor_test()
     # img_predictor_test_v2()
-    img_predictor_test_v3()
+    # img_predictor_test_v3()
     # merge_outputs()
     # merge_sample()
     # resize_folder()

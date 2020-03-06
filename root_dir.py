@@ -10,3 +10,4 @@ import os
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # 存储项目所在的绝对路径
 
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
+DATASET_DIR = os.path.join(ROOT_DIR, 'dataset')

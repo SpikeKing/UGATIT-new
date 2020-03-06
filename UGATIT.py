@@ -4,13 +4,21 @@
 Copyright (c) 2019. All rights reserved.
 Created by C. L. Wang on 2020/1/2
 """
+import os
+import time
+from glob import glob
+
+import numpy as np
+from tensorflow.contrib.data import prefetch_to_device, shuffle_and_repeat, map_and_batch
+from tensorflow.python.ops import control_flow_ops, resources
+from tensorflow.python.saved_model import builder as saved_model_builder
+from tensorflow.python.saved_model import signature_constants
+from tensorflow.python.saved_model import tag_constants
 
 from ops import *
-from utils.ugatit_utils import *
-from glob import glob
-import time
-from tensorflow.contrib.data import prefetch_to_device, shuffle_and_repeat, map_and_batch
-import numpy as np
+from root_dir import DATA_DIR
+from utils.project_utils import mkdir_if_not_exist
+from utils.ugatit_utils import save_images, load_test_data, ImageData, check_folder
 
 
 class UGATIT(object):
@@ -123,10 +131,86 @@ class UGATIT(object):
         sample_image = np.asarray(load_test_data(img_path, size=self.img_size))
         return sample_image
 
+    def export_model(self):
+        """
+        参数名称:
+        output: self.test_fake_B: Tensor("generator_B/Tanh:0", shape=(1, 256, 256, 3), dtype=float32)
+        input: self.test_domain_A: Tensor("test_domain_A:0", shape=(1, 256, 256, 3), dtype=float32)
+
+        [Info] input_tensor: Tensor("input_1:0", shape=(?, 224, 224, 3), dtype=float32)
+        [Info] output_tensors.values(): [<tf.Tensor 'dense_1/Softmax:0' shape=(?, 10) dtype=float32>]
+        :return:
+        """
+        from smnn.io.parser import sm_kv_record_parser
+
+        data_schema = os.path.join(DATA_DIR, 'schema.json')
+        sm_parser = sm_kv_record_parser.SmKVRecordParser(data_schema, '[dat]', '[common]')
+        sm_parser.init()
+
+        raw_input_tensor = tf.placeholder(tf.string, [None])
+        tensor_dict = sm_parser.get_tensor_dict(raw_input_tensor)
+        image_b64 = tensor_dict['image']  # 来源于data_schema
+
+        image = tf.decode_base64(image_b64)
+        image = tf.decode_raw(image, tf.float32)
+        image = tf.image.convert_image_dtype(image, tf.float32)
+        image = tf.reshape(image, [-1, 256, 256, 3])  # 图像
+        img_tensor = image / 127.5 - 1.
+
+        input_tensor = tf.get_default_graph().get_tensor_by_name("{}:0".format("test_domain_A"))
+        output_tensor = tf.get_default_graph().get_tensor_by_name("{}:0".format("generator_B/Tanh"))
+
+        res_ops = tf.contrib.graph_editor.graph_replace([output_tensor], {input_tensor: img_tensor})
+
+        inputs = {"input": raw_input_tensor}  # 输入String图像
+        outputs = {"output": res_ops[0]}  # 输出
+
+        prediction_signature = tf.saved_model.signature_def_utils.predict_signature_def(inputs, outputs)
+        signature_map = {signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY: prediction_signature}
+
+        legacy_op = control_flow_ops.group(
+            tf.local_variables_initializer(),
+            resources.initialize_resources(resources.shared_resources()),
+            tf.tables_initializer())
+
+        res_dir = os.path.join(DATA_DIR, 'model-tf')
+        mkdir_if_not_exist(res_dir)
+        builder = saved_model_builder.SavedModelBuilder(res_dir)
+
+        builder.add_meta_graph_and_variables(
+            self.sess, [tag_constants.SERVING],
+            signature_def_map=signature_map,
+            legacy_init_op=legacy_op)
+
+        builder.save()
+        print('[Info] 模型导出完成!')
+
     def predict_img(self, img_np, sess):
         """
         预测图像
         """
+        # self.test_fake_B: Tensor("generator_B/Tanh:0", shape=(1, 256, 256, 3), dtype=float32)
+        # self.test_domain_A: Tensor("test_domain_A:0", shape=(1, 256, 256, 3), dtype=float32)
+        # print(sess.graph_def)
+        # constant_graph = graph_util.convert_variables_to_constants(sess, sess.graph_def, ["generator_B/Tanh"])
+        # img_tf = tf.decode_base64(img_b64)
+        # img_tf = tf.decode_raw(img_tf, tf.float64)
+        # img_tf = tf.image.convert_image_dtype(img_tf, tf.float64)
+        # img_tf = tf.reshape(img_tf, [-1, 224, 224, 3])
+        #
+        # input_tensor = tf.get_default_graph().get_tensor_by_name("test_domain_A:0")
+        # res_ops = tf.contrib.graph_editor.graph_replace(output_tensors.values(), {input_tensor: img_tensor})
+        #
+        # pb_file_path = os.path.join(ROOT_DIR, "checkpoint", "model-tf")
+        # # # with tf.gfile.FastGFile(os.path.join(pb_file_path, "model.pb"), mode='wb') as f:
+        # # #     f.write(constant_graph.SerializeToString())
+        # builder = tf.saved_model.builder.SavedModelBuilder(pb_file_path)
+        # # # 构造模型保存的内容，指定要保存的 session，特定的 tag,
+        # # # 输入输出信息字典，额外的信息
+        # builder.add_meta_graph_and_variables(sess, [tag_constants.SERVING])
+        # builder.save()
+        # raise Exception("x")
+
         fake_img = sess.run(self.test_fake_B, feed_dict={self.test_domain_A: img_np})
         return fake_img
 
